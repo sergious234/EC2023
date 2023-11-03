@@ -30,7 +30,7 @@
     INT 21h                ; |
 ;----------------------------+                     
                               
-                              
+    MOV DI, 0                                
                
                
                
@@ -47,10 +47,11 @@
 parse:
     
     CMP BX, 4
-    JZ get_ascii                  
+    JZ init_video                  
+    
                          
     MOV AL, ascii[BX+2]
-    MUL pesos[bx]
+    MUL pesos[BX]
     ADD CL, AL
     
     INC BX
@@ -58,37 +59,66 @@ parse:
                               
     
     
-
-get_ascii:
-             
-    
-    
-    MOV AL, cl
-    NOT AL
-    ADD AL, 1
-    MOV BL, 10
-    DIV BL
-                    
-
-    MOV DX, AX
-    
-                               
-print:    
-                              
+init_video:
     MOV AL, 03h
     MOV AH, 00h
     INT 10H
     
     MOV AX, 0b800h
-    mov ES, AX
+    mov ES, AX    
     
-    MOV DI, 0
-                   
 
-signo_menos:               
+c1: 
+    MOV AX, 0
+    MOV AL, CL 
+    NOT AL
+    MOV BL, 10
+    DIV BL
+    MOV DX, AX
+    MOV BX, AX
     
+    AND BL, 1000b
+    CMP BL, 0
+    JE signo
+    
+
+signo:
+   
+    
+              
+    MOV ES:[DI+2], 45
+    ADD DI, 2    
+                               
+print:    
     ADD DH, 48
     MOV ES:[DI+2], DH
+
+
+
+    MOV DI, 160
+c2:        
+    MOV AX, 0
+    MOV AL, CL 
+    NOT AL
+    INC AL   
+    MOV BL, 10
+    DIV BL
+    MOV DX, AX
+    MOV BX, AX
+    
+    AND BX, 1000b
+    CMP BH, 0
+    JE signo2
+    
+
+signo2:
+        
+              
+    MOV ES:[DI+2], 45
+    ADD DI, 2    
+                               
+    ADD DH, 48
+    MOV ES:[DI+2], DH  
                                
                                
 fin:
